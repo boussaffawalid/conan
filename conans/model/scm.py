@@ -40,6 +40,8 @@ class SCMData(object):
         self.url = _get_dict_value(data, "url", string_types)
         self.revision = _get_dict_value(data, "revision", string_types + (int, ),
                                         disallowed_type=bool)  # bool is subclass of integer
+        self.reference = _get_dict_value(data, "reference", string_types)
+
         self.verify_ssl = _get_dict_value(data, "verify_ssl", bool, SCMData.VERIFY_SSL_DEFAULT)
         self.username = _get_dict_value(data, "username", string_types)
         self.password = _get_dict_value(data, "password", string_types)
@@ -122,7 +124,7 @@ class SCM(object):
         output = ""
         if self._data.type == "git":
             def use_not_shallow():
-                out = self.repo.clone(url=self._data.url, shallow=False)
+                out = self.repo.clone(url=self._data.url, shallow=False, reference=self._data.reference)
                 out += self.repo.checkout(element=self._data.revision,
                                           submodule=self._data.submodule)
                 return out
@@ -130,7 +132,7 @@ class SCM(object):
             def use_shallow():
                 try:
                     out = self.repo.clone(url=self._data.url, branch=self._data.revision,
-                                          shallow=True)
+                                          shallow=True, reference=self._data.reference)
                 except subprocess.CalledProcessError:
                     # remove the .git directory, otherwise, fallback clone cannot be successful
                     # it's completely safe to do here, as clone without branch expects
