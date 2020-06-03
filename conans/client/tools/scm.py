@@ -110,7 +110,7 @@ class Git(SCMBase):
             output += self.run("checkout -t origin/%s" % branch)
         return output
 
-    def clone(self, url, branch=None, args="", shallow=False):
+    def clone(self, url, branch=None, args="", shallow=False, reference=""):
         """
         :param url: repository remote URL to clone from (e.g. https, git or local)
         :param branch: actually, can be any valid git ref expression like,
@@ -121,6 +121,8 @@ class Git(SCMBase):
         - expression like HEAD~1
         :param args: additional arguments to be passed to the git command (e.g. config args)
         :param shallow:
+        :param reference: local reference repo to use as a cache
+            more details here https://randyfay.com/content/reference-cache-repositories-speed-clones-git-clone-reference
         :return: output of the clone command
         """
         # TODO: rename "branch" -> "element" in Conan 2.0
@@ -134,7 +136,8 @@ class Git(SCMBase):
             return self._fetch(url, branch, shallow)
         branch_cmd = "--branch %s" % branch if branch else ""
         shallow_cmd = "--depth 1" if shallow else ""
-        output = self.run('clone "%s" . %s %s %s' % (url, branch_cmd, shallow_cmd, args))
+        reference_cmd = "--reference %s" % reference if reference else ""
+        output = self.run('clone "%s" . %s %s %s %s' % (url, branch_cmd, shallow_cmd, reference_cmd, args))
 
         return output
 
