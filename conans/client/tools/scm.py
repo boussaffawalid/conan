@@ -111,6 +111,7 @@ class Git(SCMBase):
         return output
 
     def clone(self, url, branch=None, args="", shallow=False, reference=""):
+
         """
         :param url: repository remote URL to clone from (e.g. https, git or local)
         :param branch: actually, can be any valid git ref expression like,
@@ -137,6 +138,8 @@ class Git(SCMBase):
         branch_cmd = "--branch %s" % branch if branch else ""
         shallow_cmd = "--depth 1" if shallow else ""
         reference_cmd = "--reference %s" % reference if reference else ""
+        self.output.info('git clone "%s" . %s %s %s %s' % (url, branch_cmd, shallow_cmd, reference_cmd, args))
+
         output = self.run('clone "%s" . %s %s %s %s' % (url, branch_cmd, shallow_cmd, reference_cmd, args))
 
         return output
